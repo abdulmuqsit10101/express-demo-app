@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
-const venres = [
+var venres = [
   {
     id: 1,
     type: 'entertaining',
@@ -128,32 +128,52 @@ app.post('/vidly/venres', (req, res) => {
 
 
 
-app.post('/vidly/venres', (req, res) => {
+app.put('/vidly/venres/:type', (req, res) => {
+
+  // Find venre from venres list.
+  const venre = venres.find(v => v.type === req.params.type);
+
+  // If venre not exists.
+  if(!venre) {
+    return res.status(404).send(`Can not find venres of ${req.params.name} type`);
+  }
 
   // Defined Joi schema for validation of body.
   const schema = {
-    type: Joi.string().min(3).required(),
     value: Joi.array().items(Joi.string().min(3).required()),
   }
 
   // Destructure error from joi validate.
   const { error } = Joi.validate(req.body, schema);
-  console.log(error);
 
   // If found error's value is not null do this.
   if(error){
-    return res.status(400).send(result.error.details[0].message);
+    return res.status(400).send(error.details[0].message);
   }
 
-  // Create new venre to post in venres.
-  const venre = {
-    id: venres.length + 1,
-    type: req.body.type,
-    value: req.body.value,
-  };
-  venres.push(venre);
-  res.send(venre);
+  venre.value = req.body.value;
+  const index = venres.indexOf(venre);
 
+  // Create new venre to post in venres.
+  venres[index] = venre;
+  res.send(venre);
+});
+
+
+app.delete('/vidly/venres/:type', (req, res) => {
+
+  // Find venre from venres list.
+  const venre = venres.find(v => v.type === req.params.type);
+
+  // If venre not exists.
+  if(!venre) {
+    return res.status(404).send(`Can not find venres of ${req.params.type} type`);
+  }
+
+  // const index = venres.findIndex(venre);
+  const newVenres = [...venres].filter(v => v.type !== req.params.type);
+  venres = newVenres;
+  res.send(venre);
 });
 
 
