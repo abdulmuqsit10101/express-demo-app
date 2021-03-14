@@ -3,15 +3,18 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3003;
 const Logger = require('./middleware/logger.js');
-const Authenticate = require('./middleware/Authentication.js');
+// const Authenticate = require('./middleware/Authentication.js');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
+app.use(helmet());
+app.use(morgan('tiny'));
 app.use(Logger);
 
-app.use(Authenticate);
+// app.use(Authenticate);
 
 var courses = [
   {id: 1, name: 'course1'},
@@ -20,7 +23,7 @@ var courses = [
 ];
 
 app.get('/', (req, res) => {
-  res.send('Hello World!x');
+  res.send('Hello World!');
 });
 
 app.get('/api/courses', (req, res) => {
