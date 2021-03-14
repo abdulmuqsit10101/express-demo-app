@@ -2,8 +2,16 @@ const Joi = require('joi');
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3003;
+const Logger = require('./middleware/logger.js');
+const Authenticate = require('./middleware/Authentication.js');
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+app.use(Logger);
+
+app.use(Authenticate);
 
 var courses = [
   {id: 1, name: 'course1'},
